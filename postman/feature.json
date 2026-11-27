@@ -1,0 +1,206 @@
+{
+  "info": {
+    "_postman_id": "9a30da14-136b-471d-adf0-9387b68fcd9b",
+    "name": "ExploreWithMe сервис статистики",
+    "description": "Локальная проверка сервиса статистики (localhost:9090)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "15456887"
+  },
+  "item": [
+    {
+      "name": "POST /hit",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Статус 201', function () {",
+              "    pm.response.to.have.status(201);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"app\": \"ewm-main-service\",\n  \"uri\": \"/events/1\",\n  \"ip\": \"192.163.0.1\",\n  \"timestamp\": \"2022-09-06 11:00:23\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/hit",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "hit"
+          ]
+        },
+        "description": "Сохранение информации о запросе к эндпоинту. Ожидаем: 201 Created."
+      },
+      "response": []
+    },
+    {
+      "name": "POST /hit (другой IP)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Статус 201', function () {\n    pm.response.to.have.status(201);\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"app\": \"ewm-main-service\",\n  \"uri\": \"/events/1\",\n  \"ip\": \"192.163.0.2\",\n  \"timestamp\": \"2022-09-06 12:00:23\"\n}",
+          "options": {
+            "raw": {
+              "language": "text"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/hit",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "hit"
+          ]
+        },
+        "description": "Второй hit с другим IP для проверки unique."
+      },
+      "response": []
+    },
+    {
+      "name": "GET /stats",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Статус 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Тело — непустой массив', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body).to.be.an('array');",
+              "    pm.expect(body.length).to.be.above(0);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/stats?start=2022-09-06 00:00:00&end=2022-09-07 00:00:00&uris=/events/1&unique=false",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "stats"
+          ],
+          "query": [
+            {
+              "key": "start",
+              "value": "2022-09-06 00:00:00"
+            },
+            {
+              "key": "end",
+              "value": "2022-09-07 00:00:00"
+            },
+            {
+              "key": "uris",
+              "value": "/events/1"
+            },
+            {
+              "key": "unique",
+              "value": "false"
+            }
+          ]
+        },
+        "description": "Статистика по посещениям. Ожидаем: 200 и массив ViewStats."
+      },
+      "response": []
+    },
+    {
+      "name": "GET /stats (unique)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Статус 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Тело — массив', function () {",
+              "    pm.expect(pm.response.json()).to.be.an('array');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/stats?start=2022-09-06 00:00:00&end=2022-09-07 00:00:00&uris=/events/1&unique=true",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "stats"
+          ],
+          "query": [
+            {
+              "key": "start",
+              "value": "2022-09-06 00:00:00"
+            },
+            {
+              "key": "end",
+              "value": "2022-09-07 00:00:00"
+            },
+            {
+              "key": "uris",
+              "value": "/events/1"
+            },
+            {
+              "key": "unique",
+              "value": "true"
+            }
+          ]
+        },
+        "description": "Статистика только по уникальным IP."
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:9090"
+    }
+  ]
+}
